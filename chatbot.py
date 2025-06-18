@@ -282,6 +282,8 @@ if st.session_state.sidebar_state == 'expanded':
         <hr style='border: 1px solid #444;'>
         <h3 style='color: #ff4b4b; font-size: 1.1rem; margin-bottom: 0.5rem;'>Sesi Chat Sebelumnya</h3>
     """, unsafe_allow_html=True)
+
+
     
     # Load and display chat sessions in sidebar
     chat_sessions = load_chat_sessions()
@@ -314,7 +316,7 @@ if st.session_state.sidebar_state == 'expanded':
             st.markdown(chat["content"])
 
 #==============================================================#
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = st.text_input("input token disini")
 MODEL = "openai/gpt-3.5-turbo"
 
 HEADERS = {
