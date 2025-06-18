@@ -314,7 +314,7 @@ if st.session_state.sidebar_state == 'expanded':
             st.markdown(chat["content"])
 
 #==============================================================#
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 MODEL = "openai/gpt-3.5-turbo"
 
 HEADERS = {

@@ -1,0 +1,13 @@
+{
+  "timestamp": "20250618_144202",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hallo"
+    },
+    {
+      "role": "assistant",
+      "content": "Hallo! Wie kann ich Ihnen helfen?"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "timestamp": "20250618_143804",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hallo chatbot"
+    },
+    {
+      "role": "assistant",
+      "content": "⚠️ Maaf, terjadi kesalahan dalam memproses permintaan Anda."
+    }
+  ]
+}
