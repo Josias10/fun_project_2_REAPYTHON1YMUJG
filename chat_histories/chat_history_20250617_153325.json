@@ -1,0 +1,21 @@
+{
+  "timestamp": "20250617_153325",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Test"
+    },
+    {
+      "role": "assistant",
+      "content": "How can I assist you with your test? Let me know if you have any questions or need help with anything specific."
+    },
+    {
+      "role": "user",
+      "content": "Bisa kah kamu berbahasa France?"
+    },
+    {
+      "role": "assistant",
+      "content": "Oui, je peux parler français! Comment puis-je vous aider aujourd'hui?"
+    }
+  ]
+}

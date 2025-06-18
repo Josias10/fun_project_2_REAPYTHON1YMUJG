@@ -1,0 +1,26 @@
+[
+  {
+    "role": "user",
+    "content": "Hello"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello! How can I assist you today?"
+  },
+  {
+    "role": "user",
+    "content": "Bisakah kamu berbahasa indonesia?"
+  },
+  {
+    "role": "assistant",
+    "content": "Ya, saya bisa berbahasa Indonesia. Ada yang bisa saya bantu?"
+  },
+  {
+    "role": "user",
+    "content": "Coba kamu sebutkan kosakata apa saja dalam bahasa indonesia"
+  },
+  {
+    "role": "assistant",
+    "content": "Tentu, berikut adalah beberapa contoh kosakata dalam Bahasa Indonesia:\n\n1. Rumah\n2. Sekolah\n3. Buku\n4. Komputer\n5. Makanan\n6. Minuman\n7. Pakaian\n8. Mobil\n9. Telepon\n10. Hewan\n\nSemoga informasi ini bermanfaat! Apakah ada yang bisa saya bantu lagi?"
+  }
+]

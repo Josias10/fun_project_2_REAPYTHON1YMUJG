@@ -1,0 +1,21 @@
+{
+  "timestamp": "20250617_160009",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! How can I assist you today?"
+    },
+    {
+      "role": "user",
+      "content": "namamu siapa?"
+    },
+    {
+      "role": "assistant",
+      "content": "Saya adalah asisten virtual yang siap membantu Anda dengan pertanyaan atau masalah apa pun. Apakah ada yang bisa saya bantu hari ini?"
+    }
+  ]
+}

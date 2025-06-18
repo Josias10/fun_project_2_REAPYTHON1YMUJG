@@ -1,0 +1,37 @@
+{
+  "timestamp": "20250617_153344",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Test"
+    },
+    {
+      "role": "assistant",
+      "content": "How can I assist you with your test? Let me know if you have any questions or need help with anything specific."
+    },
+    {
+      "role": "user",
+      "content": "Bisa kah kamu berbahasa France?"
+    },
+    {
+      "role": "assistant",
+      "content": "Oui, je peux parler français! Comment puis-je vous aider aujourd'hui?"
+    },
+    {
+      "role": "user",
+      "content": "kalau bahasa indonesia?"
+    },
+    {
+      "role": "assistant",
+      "content": "Ya, saya dapat berbicara dalam bahasa Indonesia. Ada yang bisa saya bantu?"
+    },
+    {
+      "role": "user",
+      "content": "baik terima kasih"
+    },
+    {
+      "role": "assistant",
+      "content": "Terima kasih! Ada yang bisa saya bantu?"
+    }
+  ]
+}
