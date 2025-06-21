@@ -6,20 +6,11 @@ from datetime import datetime
 
 # Hide Streamlit default menu
 st.set_page_config(
-    page_title="AI Assistant Pro",
+    page_title="ChatBot AI",
     page_icon="🤖",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
-
-# Initialize session state for sidebar visibility
-if 'sidebar_state' not in st.session_state:
-    st.session_state.sidebar_state = 'expanded'
-
-def toggle_sidebar():
-    if st.session_state.sidebar_state == 'expanded':
-        st.session_state.sidebar_state = 'collapsed'
-    else:
-        st.session_state.sidebar_state = 'expanded'
 
 # Fungsi untuk menyimpan chat history ke file
 def save_chat_history(chat_history):
@@ -80,11 +71,18 @@ def load_specific_chat_history(filename, q_index):
 # Inisialisasi session state
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "current_chat_id" not in st.session_state:
+    st.session_state.current_chat_id = None
 
 # Custom CSS untuk tampilan yang lebih profesional
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+button[data-testid="stSidebarNavCollapseButton"],
+button[data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+}
 
 header {visibility: hidden;}
 #MainMenu {visibility: hidden;}
@@ -94,64 +92,7 @@ div[data-testid="stToolbar"] {
     visibility: hidden;
 }
 
-.navbar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: linear-gradient(135deg, #232526 0%, #414345 100%);
-    z-index: 999999;
-    padding: 0 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.navbar-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
-    font-family: 'Press Start 2P', cursive;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.navbar-title:hover {
-    transform: scale(1.05);
-    color: #ff4b4b;
-}
-
-.navbar-menu {
-    display: flex;
-    gap: 20px;
-}
-
-.navbar-item {
-    color: #e0e0e0;
-    text-decoration: none;
-    padding: 5px 15px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
-.navbar-item:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-}
-
 .main-content {
-    margin-top: 60px;
     padding: 1rem;
 }
 
@@ -170,7 +111,7 @@ div[data-testid="stToolbar"] {
 
 .chat-message.user {
     background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
-    color: black;
+    color: white;
     margin-left: 20%;
     text-align: right;
     display: flex;
@@ -187,18 +128,49 @@ div[data-testid="stToolbar"] {
     text-align: left;
 }
 
-/* Input styling */
-.stChatInput {
-    border-radius: 25px;
-    border: 1px solidrgb(21, 20, 20);
-    padding: 1rem;
-    background: grey;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Input styling for responsiveness */
+div[data-testid="stChatInput"] {
+    background-color: transparent !important;
+    border-top: none !important;
+    padding-bottom: 1rem; /* Space for the floating input */
 }
 
-.stChatInput:focus {
-    border-color: #283593;
-    box-shadow: 0 0 0 2px rgba(40,53,147,0.2);
+/* The actual floating input box */
+div[data-testid="stChatInput"] > div {
+    border-radius: 25px;
+    border: 1px solid #4f4f6a;
+    padding: 0.5rem 1rem;
+    background: #2d2d44;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: all 0.2s ease-in-out;
+}
+
+div[data-testid="stChatInput"] > div:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* The actual text input field inside */
+div[data-testid="stChatInput"] input {
+    background-color: transparent !important;
+    border: none !important;
+    color: white;
+    padding: 0 !important;
+}
+
+div[data-testid="stChatInput"] input::placeholder {
+    color: #a0a0b0 !important;
+    font-style: italic;
+}
+
+/* Send button styling */
+button[data-testid="stChatMessageSendButton"] svg {
+    fill: white;
+    transition: fill 0.2s ease-in-out;
+}
+
+button[data-testid="stChatMessageSendButton"]:hover svg {
+    fill: #6366f1;
 }
 
 /* Button styling */
@@ -223,100 +195,192 @@ div[data-testid="stToolbar"] {
 
 /* Custom sidebar styling */
 section[data-testid="stSidebar"] > div:first-child {
-    background: linear-gradient(135deg, #232526 0%, #414345 100%);
-    border-radius: 20px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    padding: 2rem 1rem 2rem 1rem;
-    margin: 1.5rem 0.5rem 1.5rem 0.5rem;
+    background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+    border-radius: 0 20px 20px 0;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+    padding: 1rem;
+    margin: 1rem 0 1rem 0;
     min-height: 90vh;
+    border-left: 3px solid #6366f1;
 }
 
 [data-testid="stSidebar"] {
     z-index: 999998;
-    margin-top: 60px;
-    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
 }
 
-.sidebar-trigger {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 200px;
-    height: 60px;
-    z-index: 999999;
-    cursor: pointer;
-    background: transparent;
+/* Sidebar content styling */
+[data-testid="stSidebar"] .stMarkdown {
+    color: #e2e8f0;
+}
+
+[data-testid="stSidebar"] h1, 
+[data-testid="stSidebar"] h2, 
+[data-testid="stSidebar"] h3 {
+    color: #f8fafc !important;
+    font-weight: 600;
+}
+
+[data-testid="stSidebar"] .stTextInput > div > div > input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    padding: 0.75rem;
+}
+
+/* Sidebar button styling */
+[data-testid="stSidebar"] .stButton > button {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
     border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Success and warning message styling */
+[data-testid="stSidebar"] .stAlert {
+    border-radius: 8px;
+    border: none;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+[data-testid="stSidebar"] .stAlert[data-baseweb="notification"] {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border-left: 4px solid #22c55e;
+}
+
+[data-testid="stSidebar"] .stAlert[data-baseweb="notification"][data-testid="stAlert"] {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border-left: 4px solid #f59e0b;
+}
+
+/* Info message styling */
+[data-testid="stSidebar"] .stAlert[data-baseweb="notification"][data-testid="stAlert"] {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-left: 4px solid #3b82f6;
+}
+
+/* Divider styling */
+[data-testid="stSidebar"] hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    margin: 1.5rem 0;
+}
+
+/* Small text styling */
+[data-testid="stSidebar"] small {
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+/* Footer styling */
+[data-testid="stSidebar"] .stMarkdown p {
+    margin: 0.25rem 0;
+    color: #64748b;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Render navbar with clickable title for sidebar toggle
-st.markdown("""
-    <div class="navbar-container">
-        <div class="navbar-title" onclick="handleSidebarToggle()">
-            🤖 CHATBOT
+# Inisialisasi awal agar variabel selalu ada
+OPENROUTER_API_KEY = ""
+
+# Render sidebar
+with st.sidebar:
+    # Header section with better styling
+    st.markdown("""
+        <div style="text-align: center; padding: 1rem 0; border-bottom: 2px solid #444; margin-bottom: 2rem;">
+            <h1 style='color: white; margin: 0; font-size: 1.8rem; font-weight: bold;'>🤖 AI CHATBOT</h1>
+            <p style='color: #cccccc; margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.8;'>Powered by OpenAI GPT-3.5 & OpenRouter</p>
         </div>
-        <div class="navbar-menu">
-            <span class="navbar-item">Home</span>
-            <span class="navbar-item">About</span>
-            <span class="navbar-item">Settings</span>
+    """, unsafe_allow_html=True)
+    
+    # API Key section with better organization
+    st.markdown("### 🔑 API Configuration")
+    OPENROUTER_API_KEY = st.text_input(
+        "OpenRouter API Key", 
+        type="password",
+        placeholder="Enter your API key here...",
+        help="Get your API key from https://openrouter.ai/keys"
+    )
+    
+    # API Key status indicator
+    if OPENROUTER_API_KEY:
+        st.success("✅ API Key configured successfully")
+    else:
+        st.warning("⚠️ Please enter your API Key to start chatting")
+    
+    st.markdown("---")
+    
+    # Chat History section with better organization
+    st.markdown("### 📚 Chat History")
+    
+    # Load and display chat sessions
+    chat_sessions = load_chat_sessions()
+    
+    if not chat_sessions:
+        st.info("No chat history found. Start a new conversation!")
+    else:
+        current_date = None
+        for session in chat_sessions:
+            session_id = f"{session['filename']}_{session['q_index']}"
+            timestamp = datetime.strptime(session['timestamp'], "%Y%m%d_%H%M%S")
+            date_str = timestamp.strftime("%d/%m/%Y")
+            
+            # Date header
+            if date_str != current_date:
+                st.markdown(f"**📅 {date_str}**")
+                current_date = date_str
+            
+            # Time and question preview
+            time_str = timestamp.strftime("%H:%M")
+            question_preview = session['question'][:40] + "..." if len(session['question']) > 40 else session['question']
+            
+            # Create a more compact button layout
+            col1, col2 = st.columns([0.7, 0.3])
+            with col1:
+                if st.button(
+                    f"💬 {question_preview}",
+                    key=f"btn_{session_id}",
+                    use_container_width=True
+                ):
+                    st.session_state.chat_history = load_specific_chat_history(session['filename'], session['q_index'])
+                    st.session_state.current_chat_id = session_id
+                    st.rerun()
+            
+            with col2:
+                st.markdown(f"<div style='text-align: right; padding-top: 0.5rem;'><small style='color: #888;'>{time_str}</small></div>", unsafe_allow_html=True)
+            
+            # Add small spacing between items
+            st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Footer section
+    st.markdown("""
+        <div style="text-align: center; padding: 1rem 0; color: #888; font-size: 0.8rem;">
+            <p>Created By Josias Marchellino Pakpahan</p>
+            <p>Version 1.0</p>
         </div>
-    </div>
-
-    <script>
-        function handleSidebarToggle() {
-            window.parent.document.querySelector('button[kind=secondary][aria-label="Toggle sidebar"]').click();
-        }
-    </script>
-""", unsafe_allow_html=True)
-
-# Add spacing for navbar
-st.markdown('<div style="margin-top: 60px;"></div>', unsafe_allow_html=True)
-
-# Toggle sidebar based on state
-if st.session_state.sidebar_state == 'expanded':
-    st.sidebar.markdown("""
-        <h1 style='color: white; text-align: left; margin-bottom: 0.5rem; font-size: 2rem;'>🤖 AI CHATBOT</h1>
-        <p style='color: #cccccc; text-align: left; font-size: 1rem; margin-bottom: 1.5rem;'>Support by GPT and OpenRouter</p>
-        <hr style='border: 1px solid #444;'>
-        <h3 style='color: #ff4b4b; font-size: 1.1rem; margin-bottom: 0.5rem;'>Sesi Chat Sebelumnya</h3>
     """, unsafe_allow_html=True)
 
-
-    
-    # Load and display chat sessions in sidebar
-    chat_sessions = load_chat_sessions()
-    current_date = None
-
-    for session in chat_sessions:
-        timestamp = datetime.strptime(session['timestamp'], "%Y%m%d_%H%M%S")
-        date_str = timestamp.strftime("%d/%m/%Y")
-        
-        # Tampilkan tanggal sebagai pemisah jika berbeda dari sebelumnya
-        if date_str != current_date:
-            st.sidebar.markdown(f"### 📅 {date_str}")
-            current_date = date_str
-        
-        # Tampilkan waktu dan pertanyaan
-        time_str = timestamp.strftime("%H:%M")
-        question_preview = session['question'][:50] + "..." if len(session['question']) > 50 else session['question']
-        
-        if st.sidebar.button(
-            f"📝 Pertanyaan: {question_preview}",
-            key=f"{session['filename']}_{session['q_index']}",
-            help=f"Waktu: {time_str}",
-            use_container_width=True
-        ):
-            st.session_state.chat_history = load_specific_chat_history(session['filename'], session['q_index'])
-
-    # Display current chat history
-    for chat in st.session_state.chat_history:
-        with st.chat_message(chat["role"]):
-            st.markdown(chat["content"])
-
 #==============================================================#
-OPENROUTER_API_KEY = st.text_input("input token disini")
+# MODEL dan API URL
 MODEL = "openai/gpt-3.5-turbo"
 
 HEADERS = {
@@ -329,10 +393,21 @@ HEADERS = {
 API_URL = f"https://openrouter.ai/api/v1/chat/completions"
 #==============================================================#
 
+# Display chat messages from history
+for message in st.session_state.chat_history:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
 # Chat input
-user_input = st.chat_input("Ketik pesan Anda di sini...")
+user_input = st.chat_input("Type your message here...")
+
 
 if user_input:
+    # If starting a new chat after viewing history, reset history
+    if st.session_state.current_chat_id is not None:
+        st.session_state.chat_history = []
+        st.session_state.current_chat_id = None
+
     st.chat_message("user").markdown(user_input)
     st.session_state.chat_history.append({"role": "user", "content": user_input})
 
@@ -357,10 +432,5 @@ if user_input:
     
     # Save chat history
     save_chat_history(st.session_state.chat_history)
-
-# # Footer
-# st.markdown("""
-#     <div class="footer">
-#         Dibuat dengan ❤️ menggunakan Streamlit | AI Assistant Pro v1.0
-#     </div>
-# """, unsafe_allow_html=True)
+    
+    st.rerun()
