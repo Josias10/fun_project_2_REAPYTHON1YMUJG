@@ -325,6 +325,13 @@ with st.sidebar:
     else:
         st.warning("⚠️ Please enter your API Key to start chatting")
     
+    st.write("""
+    Perhatikan : 
+    - API Key harus diisi untuk memulai chat
+    - API Key dapat diambil di https://openrouter.ai/keys
+    - Selain dari OpenRouter, API Key lainnya tidak dapat digunakan
+    """)
+
     st.markdown("---")
     
     # Chat History section with better organization
