@@ -3,7 +3,7 @@
 ### AI Chatbot Asisstant Pro
 #### Josias Marchellino Pakpahan
 
-Link apps : 
+Link apps : https://project2chatbot2.streamlit.app/  
 
 Pada proyek ini, telah dibuat chatbot AI berbasis web app, dimana user bisa mengajukan berbagai pertanyaan. Aplikasi ini disupport dengan :  
 - Model OpenAi : GPT 3.5 Pro
